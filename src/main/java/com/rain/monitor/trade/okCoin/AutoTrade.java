@@ -1,9 +1,9 @@
-package com.rain.monitor.btc38;
+package com.rain.monitor.trade.okCoin;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.rain.monitor.btc38.formula.MACD;
-import com.rain.monitor.btc38.formula.StochRSI;
+import com.rain.monitor.trade.formula.MACD;
+import com.rain.monitor.trade.formula.StochRSI;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;

@@ -1,8 +1,8 @@
-package com.rain.monitor.btc38.formula;
+package com.rain.monitor.trade.formula;
 
 import java.util.ArrayList;
 import java.util.List;
-import static com.rain.monitor.btc38.util.Functions.*;
+
 /**
  * Created by chendengyu on 2016/3/18.
  */
