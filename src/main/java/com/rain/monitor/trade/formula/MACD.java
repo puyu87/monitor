@@ -1,7 +1,7 @@
 package com.rain.monitor.trade.formula;
 
 
-import com.rain.monitor.trade.formula.util.Functions;
+import static com.rain.monitor.trade.formula.util.Functions.*;
 
 import java.util.List;
 
@@ -36,11 +36,11 @@ public class MACD {
      */
     public static int checkMACD(List<Double> list) {
         int[] param = {12,26,9};
-        List<Double> ema12 = Functions.EMA(list, param[0]);
-        List<Double> ema26 = Functions.EMA(list, param[1]);
-        List<Double> diff = Functions.MINUS(ema12, ema26);
-        List<Double> dea = Functions.EMA(diff, param[2]);
-        List<Double> bar = Functions.TIMES(Functions.MINUS(diff, dea), 2D);
+        List<Double> ema12 = EMA(list, param[0]);
+        List<Double> ema26 = EMA(list, param[1]);
+        List<Double> diff = MINUS(ema12, ema26);
+        List<Double> dea = EMA(diff, param[2]);
+        List<Double> bar = TIMES(MINUS(diff, dea), 2D);
 
         Double a1 = bar.get(bar.size() - 1);
         Double a2 = bar.get(bar.size() - 2);

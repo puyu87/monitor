@@ -3,6 +3,7 @@ package com.rain.monitor.trade.formula;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.rain.monitor.trade.formula.util.Functions.*;
 /**
  * Created by chendengyu on 2016/3/18.
  */
