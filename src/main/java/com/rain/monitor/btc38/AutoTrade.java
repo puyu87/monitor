@@ -2,6 +2,8 @@ package com.rain.monitor.btc38;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.rain.monitor.btc38.formula.MACD;
+import com.rain.monitor.btc38.formula.StochRSI;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;

@@ -1,4 +1,4 @@
-package com.rain.monitor.btc38;
+package com.rain.monitor.btc38.formula;
 
 
 import static com.rain.monitor.btc38.util.Functions.*;
