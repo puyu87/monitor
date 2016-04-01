@@ -46,7 +46,7 @@ public class MACD {
         Double a2 = bar.get(bar.size() - 2);
         Double a3 = bar.get(bar.size() - 3);
         // num < 0 表示 下跌 =0 表示横向  >0 表示 上涨
-        int num = Double.compare(a1, a2) + Double.compare(a1, a3) + Double.compare(a2, a3);
+        int num = Double.compare(a1, a2);
         int way = Integer.compare(num, 0) + 2;
 
         int pos = (a1>0 && a2>0 && a3 > 0)?30 :((a1<0 && a2<0 && a3 < 0)?10:20);

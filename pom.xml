@@ -7,7 +7,7 @@
     <groupId>com.newnoriental</groupId>
     <artifactId>monitor</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
 
@@ -37,6 +37,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <version>4.0.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -110,6 +115,7 @@
     <build>
 
         <finalName>monitor-web</finalName>
+
         <resources>
             <resource>
                 <directory>src/main/profiles/${profiles.active}</directory>
@@ -119,8 +125,8 @@
                 <directory>src/main/resources</directory>
                 <targetPath>${project.build.outputDirectory}</targetPath>
             </resource>
-
         </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -133,22 +139,112 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip>
+                    <excludes>
+                        <exclude>**/*.sh</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
-                    <path>/</path>
-                    <uriEncoding>UTF-8</uriEncoding>
-                    <contextReloadable>false</contextReloadable>
-                    <port>7000</port>
+                    <includes>
+                        <include>**/*.class</include>
+                    </includes>
+                    <outputDirectory>${project.build.directory}/release/lib</outputDirectory>
                 </configuration>
             </plugin>
+
+            <!-- 拷贝文件，形成“发布”包文件夹release -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>copy-conf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                            <outputDirectory>${project.build.directory}/release/conf</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.outputDirectory}</directory>
+                                    <excludes>
+                                        <exclude>**/*.class</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!--todo-->
+                    <execution>
+                        <id>copy-bin</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                            <outputDirectory>${project.build.directory}/release/bin</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/bin</directory>
+                                    <includes>
+                                        <include>*.*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 拷贝依赖的jar包到lib目录 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-lib</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/release/lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+            </plugin>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-surefire-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<skip>true</skip>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+            <!--<groupId>org.apache.tomcat.maven</groupId>-->
+            <!--<artifactId>tomcat7-maven-plugin</artifactId>-->
+            <!--<version>2.2</version>-->
+            <!--<configuration>-->
+            <!--<path>/</path>-->
+            <!--<uriEncoding>UTF-8</uriEncoding>-->
+            <!--<contextReloadable>false</contextReloadable>-->
+            <!--<port>7000</port>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 </project>

@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/src/main/java/com/rain/monitor/trade/okCoin/StockClient.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/rain/monitor/trade/okCoin/future" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/rain/monitor/trade/okCoin/stock/IStockRestApi.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/rain/monitor/trade/okCoin/stock/impl" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/rain/monitor/trade/okCoin/util/HttpUtilManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/rain/monitor/trade/okCoin/util/MD5Util.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/rain/monitor/trade/okCoin/util/StringUtil.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" charset="UTF-8" />
+    <file url="PROJECT" charset="GBK" />
   </component>
 </project>

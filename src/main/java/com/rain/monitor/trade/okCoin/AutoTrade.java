@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.rain.monitor.trade.formula.MACD;
 import com.rain.monitor.trade.formula.StochRSI;
+import org.apache.http.HttpException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -15,56 +16,115 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by chendengyu on 2016/3/16.
  */
 public class AutoTrade {
+    //åˆ›å»º çº¿ç¨‹æ± 
+    protected static ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(10);
 
-    public static void main(String[] args) throws IOException {
-        getTradeInfo();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String format1 = simpleDateFormat.format(new Date(1458470100000L));
-        String format2 = simpleDateFormat.format(new Date(1458470400000L));
-        System.out.println(format1);
-        System.out.println(format2);
+    //æ˜¯å¦æ‹¥æœ‰LTC
+    private static boolean hasCoin = false;
+    //æ˜¯å¦æœ‰æŒ‚å•LTC
+    private static boolean hasFreeCoin = false;
+    //æ˜¯å¦æœ‰æŒ‚å•äººæ°‘å¸
+    private static boolean hasFreeCny = false;
+
+    private static int times = 0;
+    public static void main(String[] args) throws IOException, HttpException {
+
+        syncMoneyStatus();
+        scheduledThreadPool.scheduleAtFixedRate(new Thread() {
+            @Override
+            public void run() {
+                times++;
+                if(times%10 == 0)
+                {
+                    OkCoinLTCTrade.REINIT = true;
+                }
+                try {
+                    println("========== "+times+" ===========");
+                    getTradeInfo();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (HttpException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 0, 1, TimeUnit.MINUTES);
     }
 
+    public static void syncMoneyStatus() throws IOException, HttpException {
+        if(OkCoinLTCTrade.REINIT)
+        {
+            Map<String, String> userInfo = OkCoinLTCTrade.getUserInfo(false);
+            hasFreeCny = Double.parseDouble(userInfo.get("cny_freezed")) >= 0.1;
+            hasFreeCoin = Double.parseDouble(userInfo.get("coin_freezed")) >= 0.1;
+            hasCoin     = Double.parseDouble(userInfo.get("coin")) >= 0.1;
+        }
+    }
     /**
-     * »ñÈ¡ okcoin µÄ ½»Ò×µÄ
-     * ÏêÏ¸ Êı¾İ
+     * è·å– okcoin çš„ äº¤æ˜“çš„
+     * è¯¦ç»† æ•°æ®
      * @throws IOException
+     * @return
      */
-    public static void getTradeInfo() throws IOException {
-        int type = 1 ;
-        // 5·ÖÖÓ Ïß
-        //String url = "https://www.okcoin.cn/api/klineData.do?marketFrom=0&type=1&limit=1000&coinVol=0";
-        //ÈÕ Ïß
-        String url = "https://www.okcoin.cn/api/klineData.do?marketFrom=0&type="+type+"&limit=1000&coinVol=0";
+    public static void getTradeInfo() throws IOException, HttpException {
+        int type = 2 ;
+        // 1  è¡¨ç¤º 5åˆ†é’Ÿçº¿  ï¼Œ2è¡¨ç¤º 15åˆ†é’Ÿçº¿
+        String url = "https://www.okcoin.cn/api/klineData.do?marketFrom=3&type="+type+"&limit=1000&coinVol=0";
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse execute = httpClient.execute(httpGet);
         String result = EntityUtils.toString(execute.getEntity());
-        System.out.println(result);
-        //JSONArray ÀïµÄ¶ÔÏó Ò²ÊÇÊı×é£¬[1457892900000,2718.77,2719.51,2718.01,2718.64,4280.376]
+        //JSONArray é‡Œçš„å¯¹è±¡ ä¹Ÿæ˜¯æ•°ç»„ï¼Œ[1457892900000,2718.77,2719.51,2718.01,2718.64,4280.376]
 
-
-
-        //´ÓµÚÒ»Ïî·Ö±ğ ´ú±í Ê±¼ä£¬¿ªÅÌ¼Û£¬×î¸ß¼Û£¬×îµÍ¼Û£¬ÊÕÅÌ¼Û£¬³É½»Á¿
+        //ä»ç¬¬ä¸€é¡¹åˆ†åˆ« ä»£è¡¨ æ—¶é—´ï¼Œå¼€ç›˜ä»·ï¼Œæœ€é«˜ä»·ï¼Œæœ€ä½ä»·ï¼Œæ”¶ç›˜ä»·ï¼Œæˆäº¤é‡
         JSONArray json = JSON.parseArray(result);
         List<Double> list = new ArrayList<>();
         for(int i=0;i<json.size();i++)
         {
             list.add(Double.parseDouble(json.getJSONArray(i).getString(4)));
         }
-        //ÅĞ¶Ï MACDÇé¿ö
+        Double fontPrice = list.get(list.size()-1);
+        println("å½“å‰ä»·æ ¼: "+fontPrice);
+        //åˆ¤æ–­ MACDæƒ…å†µ
         int posWay3 = StochRSI.checkStochRSI(list);
-        System.out.println(posWay3);
-
+        println("[ rsi]  "+posWay3+"");
         int i = MACD.checkMACD(list);
-        System.out.println(i);
-        System.out.println(json);
+        println("[macd]  "+i);
+        if(posWay3%10 == 3 && posWay3!= 33 && i%10 == 3)
+        {
+            syncMoneyStatus();
+            if(!hasCoin && !hasFreeCny)
+            {
+                println("å»ºè®®ä¹°å…¥");
+                OkCoinLTCTrade.allBuyNow(fontPrice);
+            }
+        }
+        if(posWay3%10 != 3 && i%10 != 3)
+        {
+            if(hasCoin || hasFreeCoin || hasFreeCny)
+            {
+                println("å»ºè®®å–å‡º");
+                OkCoinLTCTrade.allSellNow(fontPrice+"");
+            }
+        }
+
+    }
+
+    public static void println(String data)
+    {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(simpleDateFormat.format(new Date())+": "+data);
     }
 
 
